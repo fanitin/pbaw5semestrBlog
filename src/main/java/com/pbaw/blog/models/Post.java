@@ -18,7 +18,7 @@ public class Post {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private String title;
 
-    @Column(name = "content", nullable = false, length = 4000)
+    @Column(name = "content", nullable = false, length = 10000)
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private String content;
 
@@ -28,26 +28,51 @@ public class Post {
 
     @Column(name = "preview_image")
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    private String preview_image;
+    private String previewImage;
 
     @Column(name = "created_at", nullable = false)
     @JdbcTypeCode(SqlTypes.TIMESTAMP)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
-    public LocalDateTime getCreated_at() {
-        return created_at;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public User getUser() {
+        return user;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public String getPreview_image() {
-        return preview_image;
+    public Post() {
+
     }
 
-    public void setPreview_image(String preview_image) {
-        this.preview_image = preview_image;
+    public Post(String title, String content, Category category, String previewImage, LocalDateTime createdAt, User user) {
+        this.title = title;
+        this.content = content;
+        this.previewImage = previewImage;
+        this.createdAt = createdAt;
+        this.category = category;
+        this.user = user;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getPreviewImage() {
+        return previewImage;
+    }
+
+    public void setPreviewImage(String previewImage) {
+        this.previewImage = previewImage;
     }
 
     public Category getCategory() {
