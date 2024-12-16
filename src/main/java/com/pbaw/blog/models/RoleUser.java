@@ -10,11 +10,11 @@ public class RoleUser {
     @Column(nullable = false)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

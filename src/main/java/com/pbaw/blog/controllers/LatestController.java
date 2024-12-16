@@ -18,7 +18,6 @@ public class LatestController {
     public String home(Model model) {
         Iterable<Post> posts = postRepository.findAll(Sort.by(Sort.Order.desc("createdAt")));
         model.addAttribute("posts", posts);
-        model.addAttribute("title", "Latest posts");
         return "latest/latest";
     }
 }

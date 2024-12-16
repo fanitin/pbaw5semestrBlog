@@ -5,6 +5,9 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -14,20 +17,34 @@ public class User{
     @Column(nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 20)
+    @Column(name = "username", nullable = false, unique = true, length = 20)
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    private String name;
+    private String username;
 
     @Column(name = "email", nullable = false, unique = true)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
     private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "created_at", nullable = false)
-    @JdbcTypeCode(SqlTypes.TIMESTAMP)
     private LocalDateTime created_at;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<RoleUser> roleUsers = new HashSet<>();
+
+    public User(){}
+
+    public User(String username, String email, String password, LocalDateTime created_at) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.created_at = created_at;
+    }
+
+    public Set<Role> getRoles() {
+        return roleUsers.stream().map(RoleUser::getRole).collect(Collectors.toSet());
+    }
 
     public LocalDateTime getCreated_at() {
         return created_at;
@@ -53,12 +70,12 @@ public class User{
         this.email = email;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String name) {
+        this.username = name;
     }
 
     public Long getId() {
@@ -67,5 +84,13 @@ public class User{
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<RoleUser> getRoleUsers() {
+        return roleUsers;
+    }
+
+    public void setRoleUsers(Set<RoleUser> roleUsers) {
+        this.roleUsers = roleUsers;
     }
 }
