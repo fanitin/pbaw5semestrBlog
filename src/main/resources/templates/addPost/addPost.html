@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl" th:replace="~{layouts/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Add new post</title>
+    <style>
+        .char-count {
+            font-size: 0.9em;
+            color: gray;
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+<section>
+    <div class="container mt-5">
+        <form id="postForm" th:action="@{/post/add}" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Post title</label>
+                <input name="title" type="text" class="form-control" id="title">
+                <span id="title-error" style="color: red;"></span>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">Post content</label>
+                <textarea name="content" id="content" class="form-control"></textarea>
+                <span id="content-error" style="color: red;"></span>
+                <div id="char-count" class="char-count">10000 characters remaining</div>
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">Upload Image</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                <span id="image-error" style="color: red;"></span>
+            </div>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>
+
+<script>
+    document.getElementById("postForm").onsubmit = function(event) {
+        let isValid = true;
+
+        document.getElementById("title-error").innerHTML = "";
+        document.getElementById("content-error").innerHTML = "";
+        document.getElementById("image-error").innerHTML = "";
+
+        let title = document.getElementById("title").value;
+        if (!title) {
+            document.getElementById("title-error").innerHTML = "Title is required.";
+            isValid = false;
+        } else if (title.length > 255) {
+            document.getElementById("title-error").innerHTML = "Title must be less than 255 characters.";
+            isValid = false;
+        }
+
+        let content = document.getElementById("content").value;
+        if (!content) {
+            document.getElementById("content-error").innerHTML = "Content is required.";
+            isValid = false;
+        } else if (content.length > 10000) {
+            document.getElementById("content-error").innerHTML = "Content must be less than 10000 characters.";
+            isValid = false;
+        }
+
+        let image = document.getElementById("image").files.length;
+        if (image === 0) {
+            document.getElementById("image-error").innerHTML = "Image is required.";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    };
+
+    document.getElementById("content").addEventListener("input", function() {
+        let contentLength = this.value.length;
+        let remaining = 10000 - contentLength;
+        document.getElementById("char-count").textContent = remaining + " characters remaining";
+
+        if (remaining < 0) {
+            document.getElementById("char-count").style.color = "red";
+        } else {
+            document.getElementById("char-count").style.color = "gray";
+        }
+    });
+</script>
