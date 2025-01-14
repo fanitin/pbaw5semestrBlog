@@ -21,12 +21,10 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                )
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**", "/login", "/register", "/", "/latest/**", "/uploads/**",
-                                "/auth/**", "/layouts/**").permitAll()
+                                "/auth/**", "/layouts/**", "/favicon.ico", "/latest", "/post/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
@@ -36,12 +34,9 @@ public class SecurityConfig{
                         .failureUrl("/login?error=true")
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/?logout=true")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                );
+                    .logoutUrl("/logout").permitAll()
+                    .logoutSuccessUrl("/login")
+            );
         return http.build();
     }
 

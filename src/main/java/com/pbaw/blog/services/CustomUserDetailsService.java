@@ -21,6 +21,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.roleUserRepository = roleUserRepository;
     }
 
+    public Long getUserIdByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+        return user.getId();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)

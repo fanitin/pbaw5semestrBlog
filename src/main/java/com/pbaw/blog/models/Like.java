@@ -10,11 +10,11 @@ public class Like {
     @Column(nullable = false)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

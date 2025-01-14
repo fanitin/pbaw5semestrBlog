@@ -87,10 +87,4 @@ public class AuthController {
         redirectAttributes.addFlashAttribute("message", "Welcome, " + user.getUsername());
         return "redirect:/";
     }
-
-    @GetMapping("/logout")
-    public String logoutUser(RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("message", "You have been logged out successfully.");
-        return "redirect:/";
-    }
 }
