@@ -5,9 +5,11 @@
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                     <li><a href="/" class="nav-link px-2 text-white">Home</a></li>
                     <li><a href="/latest" class="nav-link px-2 text-white">Latest</a></li>
-                    <li><a href="myposts" class="nav-link px-2 text-white">My posts</a></li>
+                    <li><a href="/myposts" class="nav-link px-2 text-white">My posts</a></li>
                     <li><a href="/post/add" class="nav-link px-2 text-white">Add post</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">Your page</a></li>
+                    <li th:if="${userId != null}">
+                        <a th:href="@{/profile/{id}(id=${userId})}" class="nav-link px-2 text-white">Your page</a>
+                    </li>
                 </ul>
 
                 <div class="text-end">

@@ -18,12 +18,10 @@ public class Comment {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private String text;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "post_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     private Post post;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     private User user;
 
     @Column(name = "created_at", nullable = false)
@@ -68,5 +66,13 @@ public class Comment {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Comment(){}
+    public Comment(String text, Post post, User user, LocalDateTime created_at) {
+        this.text = text;
+        this.post = post;
+        this.user = user;
+        this.created_at = created_at;
     }
 }

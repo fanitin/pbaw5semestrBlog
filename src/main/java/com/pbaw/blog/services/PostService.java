@@ -99,4 +99,8 @@ public class PostService {
     public List<Comment> getCommentsForPost(Long postId) {
         return commentRepository.findByPostId(postId); // Получаем все комментарии для поста
     }
+
+    public List<Post> getPostsSortedByLikes() {
+        return postRepository.findAllPostsSortedByLikes();
+    }
 }

@@ -5,7 +5,7 @@
                 <div class="col d-flex justify-content-center" th:each="post : ${posts}">
                     <div class="card shadow-sm text-dark" style="width: 24rem; display: flex; flex-direction: column; height: 100%;">
                         <a th:href="@{/post/{id}(id=${post.id})}" class="text-decoration-none">
-                            <img th:src="${post.previewImage}"
+                            <img th:src="@{'/' + ${post.previewImage}}"
                                  class="card-img-top"
                                  alt="Post Image"
                                  style="height: 225px; object-fit: cover;">
@@ -20,15 +20,24 @@
                             </p>
                         </div>
 
-                        <div class="card-footer d-flex justify-content-between align-items-center" style="margin-top: auto;">
+                        <div class="card-footer d-flex justify-content-between align-items-center" style="margin-top: auto; position: relative;">
                             <div class="d-flex align-items-center">
                                 <a href="#" class="text-decoration-none me-2">
                                     <span class="text-muted" th:text="${post.user != null ? post.user.username : 'Unknown Author'}"></span>
                                 </a>
                             </div>
-                            <small class="text-body-secondary"
-                                   th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm').format(post.createdAt)}">
-                            </small>
+                            <div>
+
+                                <small class="text-body-secondary"
+                                       th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm').format(post.createdAt)}">
+                                </small>
+
+                                <button th:if="${#authorization.expression('hasRole(''ROLE_Worker'')') || post.user.username == #authentication.name}"
+                                        th:onclick="'deletePost(' + ${post.id} + ')'"
+                                        class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

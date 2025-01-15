@@ -29,7 +29,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        List<Post> posts = postService.getPosts();
+        List<Post> posts = postService.getPostsSortedByLikes();
         model.addAttribute("posts", posts);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -46,5 +46,12 @@ public class HomeController {
             model.addAttribute("message", "Не залогирован");
         }
         return "home/home";
+    }
+    @GetMapping("/test")
+    public String testRoles(Authentication authentication, Model model) {
+        if (authentication != null) {
+            model.addAttribute("roles", authentication.getAuthorities());
+        }
+        return "home/test";
     }
 }

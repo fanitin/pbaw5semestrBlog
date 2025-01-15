@@ -11,8 +11,11 @@ import com.pbaw.blog.services.PostService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +72,11 @@ public class PostController {
 
         List<Post> relatedPosts = postService.getPostsByCategoryExceptCurrent(post.getCategory().getId(), post.getId());
         List<Comment> comments = postService.getCommentsForPost(post.getId());
+        String categoryName = post.getCategory().getName();
+
+        org.springframework.security.core.userdetails.User springSecurityUser = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+        User user = userRepository.findByUsername(springSecurityUser.getUsername()).orElse(null);
+        boolean canDeleteComment = authentication.getAuthorities().contains(new SimpleGrantedAuthority("Worker")) || post.getUser() == user;
 
         model.addAttribute("post", post);
         model.addAttribute("date", formattedDate);
@@ -77,10 +85,11 @@ public class PostController {
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("isLikedByUser", isLikedByUser);
         model.addAttribute("comments", comments);
+        model.addAttribute("canDeleteComment", canDeleteComment);
+        model.addAttribute("categoryName", categoryName);
 
         return "post/post";
     }
-
 
     @GetMapping("/post/add")
     public String addPost(Model model) {
@@ -112,6 +121,30 @@ public class PostController {
         postRepository.save(post);
         return "redirect:/latest";
     }
+
+    @DeleteMapping("/post/delete/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id, Authentication authentication) {
+        org.springframework.security.core.userdetails.User springSecurityUser =
+                (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+
+        User user = userRepository.findByUsername(springSecurityUser.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Post post = postRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        boolean isAuthor = post.getUser().getId().equals(user.getId());
+        boolean isWorker = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_Worker"));
+
+        if (!isAuthor && !isWorker) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        postRepository.delete(post);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping("/post/like/{postId}")
     public ResponseEntity<?> toggleLike(@PathVariable Long postId, Authentication authentication) {
