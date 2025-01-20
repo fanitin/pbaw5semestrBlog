@@ -8,6 +8,9 @@ import com.pbaw.blog.repo.LikeRepository;
 import com.pbaw.blog.repo.PostRepository;
 import com.pbaw.blog.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -100,7 +103,21 @@ public class PostService {
         return commentRepository.findByPostId(postId); // Получаем все комментарии для поста
     }
 
-    public List<Post> getPostsSortedByLikes() {
-        return postRepository.findAllPostsSortedByLikes();
+    public Page<Post> getPostsSortedByLikes(Pageable pageable) {
+        return postRepository.findPostsSortedByLikes(pageable);
+    }
+
+    public Page<Post> getPostsByCategoryWithPagination(int categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return postRepository.findByCategoryId((long) categoryId, pageable);
+    }
+
+    public Page<Post> getLatestPosts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+        return postRepository.findAll(pageable);
+    }
+    public Page<Post> getPostsByUser(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+        return postRepository.findByUserId(userId, pageable);
     }
 }
