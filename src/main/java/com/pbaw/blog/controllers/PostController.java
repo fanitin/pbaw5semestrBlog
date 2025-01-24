@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -131,7 +132,7 @@ public class PostController {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         Post post = postRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
         boolean isAuthor = post.getUser().getId().equals(user.getId());
         boolean isWorker = authentication.getAuthorities().stream()
@@ -143,6 +144,29 @@ public class PostController {
 
         postRepository.delete(post);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/postpost/delete/{id}")
+    public String deletePostPost(@PathVariable Long id, Authentication authentication) {
+        org.springframework.security.core.userdetails.User springSecurityUser =
+                (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+
+        User user = userRepository.findByUsername(springSecurityUser.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Post post = postRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+
+        boolean isAuthor = post.getUser().getId().equals(user.getId());
+        boolean isWorker = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_Worker"));
+
+        if (!isAuthor && !isWorker) {
+            return "redirect:/post/" + id;
+        }
+
+        postRepository.delete(post);
+        return "redirect:/";
     }
 
 

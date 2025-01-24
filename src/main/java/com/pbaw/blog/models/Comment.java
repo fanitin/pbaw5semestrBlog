@@ -18,10 +18,12 @@ public class Comment {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private String text;
 
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(nullable = false)
     private Post post;
 
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(nullable = false)
     private User user;
 
     @Column(name = "created_at", nullable = false)

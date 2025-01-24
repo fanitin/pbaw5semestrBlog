@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -15,6 +18,9 @@ public class Category {
     @Column(name = "name", nullable = false, unique = true)
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private String name;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 
     public String getName() {
         return name;
